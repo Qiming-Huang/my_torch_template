@@ -87,7 +87,7 @@ class CustomDataSet(Dataset):
 
 # save yuur dataset inti .pkl files can faster your data loading while use extra storage.
 
-class Scene_pickle(Dataset):
+class CustomDataSet_pickle(Dataset):
     def __init__(self, mode):
         self.mode = mode
         res = open('/data/qiming/music/dataset/Scene/scene_train.pkl','rb')

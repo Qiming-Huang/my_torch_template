@@ -8,6 +8,10 @@ import os
 
 import matplotlib.pyplot as plt
 
+import pickle
+
+
+
 class CustomDataSet(Dataset):
     def __init__(self, mode):
         self.img_list, self.labels = self._init()
@@ -80,3 +84,34 @@ class CustomDataSet(Dataset):
             labels.append(i.split("_")[-1][0])
 
         return image_list, labels
+
+# save yuur dataset inti .pkl files can faster your data loading while use extra storage.
+
+class Scene_pickle(Dataset):
+    def __init__(self, mode):
+        self.mode = mode
+        res = open('/data/qiming/music/dataset/Scene/scene_train.pkl','rb')
+        data = pickle.load(res)
+
+        self.train_imgs = data['imgs']
+        self.train_labels = data['labels']
+
+        res = open('/data/qiming/music/dataset/Scene/scene_test.pkl','rb')
+        data = pickle.load(res)
+
+        self.test_imgs = data['imgs']
+        self.test_labels = data['labels']
+
+    def __len__(self):
+        if self.mode == "train":
+            return len(self.train_imgs)
+        else:
+            return len(self.test_imgs)
+
+    def __getitem__(self, index):
+        
+        if self.mode == "train":
+
+            return self.train_imgs[index], self.train_labels[index]
+        else:
+            return self.test_imgs[index], self.test_labels[index]

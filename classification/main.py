@@ -71,12 +71,12 @@ for epoch in tqdm(range(EPOCH)):
         y = y.long()
 
         pred = model(x)
-        loss = criterion(pred, y)
+        loss = criterion(pred, y.squeeze())
         total_loss += loss.item()
 
         loss.backward()
         optimizer.step()
-    logger.info(f"loss at epoch {epoch} is {total_loss / (idx + 1)}")
+    logger.info(f"training loss is {total_loss / (idx + 1)}")
 
     logger.info(f"evl at epoch {epoch}")
 
@@ -91,11 +91,11 @@ for epoch in tqdm(range(EPOCH)):
             y = y.long()
 
             pred = model(x)
+            loss = criterion(pred, y.squeeze())
             out = torch.argmax(torch.sigmoid(pred), dim=1)
-            correct += torch.sum(y == out) / len(out)
+            correct += torch.sum(y.squeeze() == out) / len(out)
 
+            test_loss += loss.item()
+    logger.info(f"test loss is {test_loss / (idx + 1)}")
     logger.info(f"accuracy is {correct / (idx + 1)}")
     model.train()
-
-    if epoch % 10 == 0:
-        torch.save(model, f"output/single_moco_correct/{epoch}_acc_{correct / (idx + 1)}.pth")

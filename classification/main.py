@@ -65,25 +65,29 @@ for epoch in tqdm(range(EPOCH)):
     model.train()
     logger.info(f"start train at epoch {epoch}")
     total_loss = 0
+    acc_train = 0
     for idx, (x, y) in enumerate(train_loader):
         x = x.to(device)
         y = y.to(device)
         y = y.long()
 
         pred = model(x)
+        out = torch.argmax(torch.sigmoid(pred), dim=1)
+        acc_train += torch.sum(y.squeeze() == out) / len(out)
         loss = criterion(pred, y.squeeze())
         total_loss += loss.item()
 
         loss.backward()
         optimizer.step()
     logger.info(f"training loss is {total_loss / (idx + 1)}")
+    logger.info(f"train accuracy is {acc_train / (idx + 1)}")
 
     logger.info(f"evl at epoch {epoch}")
 
     # eval
     model.eval()
     test_loss = 0
-    correct = 0
+    acc_test = 0
     with torch.no_grad():
         for idx, (x, y) in enumerate(test_loader):
             x = x.to(device)
@@ -93,9 +97,9 @@ for epoch in tqdm(range(EPOCH)):
             pred = model(x)
             loss = criterion(pred, y.squeeze())
             out = torch.argmax(torch.sigmoid(pred), dim=1)
-            correct += torch.sum(y.squeeze() == out) / len(out)
+            acc_test += torch.sum(y.squeeze() == out) / len(out)
 
             test_loss += loss.item()
     logger.info(f"test loss is {test_loss / (idx + 1)}")
-    logger.info(f"accuracy is {correct / (idx + 1)}")
+    logger.info(f"test accuracy is {acc_test / (idx + 1)}")
     model.train()
